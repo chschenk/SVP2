@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Clubs" %}{% endblock %}
+{% block header %}{{ object.name }}{% endblock %}
+{% block member_active %}active{% endblock %}
+{% block body %}
+<h2>{% trans "Member:" %} {{ object }}</h2>
+<table class="table table-bordered table-striped">
+    <tbody>
+            <tr>
+                <th>{% trans "First name" %}</th>
+                <td>{{ object.first_name }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Last name" %}</th>
+                <td>{{ object.last_name }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Nick name" %}</th>
+                <td>{{ object.nick_name }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Birthday" %}</th>
+                <td>{{ object.birthday }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Club" %}</th>
+                <td>{{ object.club }}</td>
+            </tr>
+    </tbody>
+</table>
+<a href="{% url 'member:edit-member' object.pk %}"><button class="btn btn-primary">{% trans "Edit member" %}</button></a>
+<a href="{% url 'member:delete-member' object.pk %}"><button class="btn btn-danger">{% trans "Delete member" %}</button></a>
+{% endblock %}

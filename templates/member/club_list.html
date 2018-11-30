@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Clubs" %}{% endblock %}
+{% block header %}{% trans "Clubs" %}{% endblock %}
+{% block member_active %}active{% endblock %}
+{% block body %}
+<table class="table table-bordered table-striped">
+    <thead class="thead-light">
+    <tr>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "Actions" %}</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for object in object_list %}
+            <tr>
+                <td>{{ object.name }}</td>
+                <td>
+                    <a href="{% url 'member:detail-club' object.pk %}" class="btn btn-default btn-sm" role="button">
+                        <span class="fas fa-eye"></span>
+                    </a>
+                    <a href="{% url 'member:edit-club' object.pk %}" class="btn btn-default btn-sm" role="button">
+                        <span class="fas fa-edit"></span>
+                    </a>
+                    <a href="{% url 'member:delete-club' object.pk %}" class="btn btn-default btn-sm" role="button">
+                        <span class="fas fa-trash"></span>
+                    </a>
+                    <a href="{% url 'member:create-club-member' object.pk %}" class="btn btn-default btn-sm" role="button">
+                        <span class="fas fa-plus"></span>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% bootstrap_pagination page_obj%}
+<a href="{% url 'member:create-club' %}"><button class="btn btn-primary">{% trans "Add club" %}</button></a>
+{% endblock %}

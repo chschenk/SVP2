@@ -1,0 +1,5 @@
+{% extends 'confirm_delete.html' %}
+{% load i18n %}
+{% block title %}{% trans "Delete member" %}{% endblock %}
+{% block message %}{% blocktrans %}Are you sure you want to delete member "{{ object }}"?{% endblocktrans %}{% endblock %}
+{% block member_active %}active{% endblock %}

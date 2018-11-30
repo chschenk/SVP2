@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block header %}{{ title }}{% endblock %}
+{% block member_active %}active{% endblock %}
+{% block body %}
+<form method="post" class="form">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <a href="{% url 'member:list-club' %}"><button type="button" class="btn btn-primary">{% trans "Cancel" %}</button></a>
+        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+    {% endbuttons %}
+</form>
+{% endblock %}

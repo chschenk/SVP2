@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Clubs" %}{% endblock %}
+{% block header %}{{ object.name }}{% endblock %}
+{% block member_active %}active{% endblock %}
+{% block body %}
+<h2>{% trans "Members:" %}</h2>
+<table class="table table-bordered table-striped">
+    <thead class="thead-light">
+    <tr>
+        <th>{% trans "First name" %}</th>
+        <th>{% trans "Last name" %}</th>
+        <th>{% trans "Nick name" %}</th>
+        <th>{% trans "Birthday" %}</th>
+        <th>{% trans "Actions" %}</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for member in object.member_set.all|dictsort:"last_name" %}
+            <tr>
+                <td>{{ member.first_name }}</td>
+                <td>{{ member.last_name }}</td>
+                <td>{{ member.nick_name }}</td>
+                <td>{{ member.birthday }}</td>
+                <td>
+                    <a href="{% url 'member:detail-member' member.pk %}" class="btn btn-default btn-sm" role="button">
+                        <span class="fas fa-eye"></span>
+                    </a>
+					<a href="{% url 'member:edit-member' member.pk %}" class="btn btn-default btn-sm" role="button">
+                        <span class="fas fa-edit"></span>
+                    </a>
+                    <a href="{% url 'member:delete-member' member.pk %}" class="btn btn-default btn-sm" role="button">
+                        <span class="fas fa-trash"></span>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% bootstrap_pagination page_obj%}
+<a href="{% url 'member:create-club-member' object.pk %}"><button class="btn btn-primary">{% trans "Add member" %}</button></a>
+<a href="{% url 'member:edit-club' object.pk %}"><button class="btn btn-primary">{% trans "Edit club" %}</button></a>
+<a href="{% url 'member:delete-club' object.pk %}"><button class="btn btn-danger">{% trans "Delete club" %}</button></a>
+{% endblock %}
