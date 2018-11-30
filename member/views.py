@@ -10,6 +10,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy, gettext
 from .models import Club, Member
 
+
 class ClubCreateView(SuccessMessageMixin, CreateView):
 	model = Club
 	fields = ['name']
@@ -20,9 +21,11 @@ class ClubCreateView(SuccessMessageMixin, CreateView):
 		kwargs['title'] = gettext("Create club")
 		return super(ClubCreateView, self).get_context_data(**kwargs)
 
+
 class ClubListView(ListView):
 	model = Club
 	paginate_by = 10
+
 
 class ClubDeleteView(SuccessMessageMixin, DeleteView):
 	model = Club
@@ -32,6 +35,7 @@ class ClubDeleteView(SuccessMessageMixin, DeleteView):
 	def delete(self, request, *args, **kwargs):
 		messages.success(self.request, self.success_message)
 		super(ClubDeleteView, self).delete(request, *args, **kwargs)
+
 
 class ClubDetailView(DetailView):
 	model = Club
@@ -49,6 +53,7 @@ class ClubDetailView(DetailView):
 		context['page_obj'] = page_obj
 		return context
 
+
 class ClubUpdateView(SuccessMessageMixin, UpdateView):
 	model = Club
 	fields = ['name']
@@ -59,13 +64,15 @@ class ClubUpdateView(SuccessMessageMixin, UpdateView):
 		kwargs['title'] = gettext("Edit club")
 		return super(ClubUpdateView, self).get_context_data(**kwargs)
 
+
 class ClubAutocompleteView(Select2QuerySetView):
 
 	def get_queryset(self):
 		qs = Club.objects.all()
 		if self.q:
 			qs = qs.filter(name__istartswith=self.q)
-		return qs
+		return qs.order_by('name')
+
 
 class MemberCreateView(SuccessMessageMixin, CreateView):
 	model = Member
@@ -89,8 +96,10 @@ class MemberCreateView(SuccessMessageMixin, CreateView):
 		form.fields['birthday'].widget = SelectDateWidget(years=list(years))
 		return form
 
+
 class MemberDetailView(DetailView):
 	model = Member
+
 
 class MemberUpdateView(SuccessMessageMixin, UpdateView):
 	model = Member
@@ -108,6 +117,7 @@ class MemberUpdateView(SuccessMessageMixin, UpdateView):
 		form.fields['birthday'].widget = SelectDateWidget(years=list(years))
 		return form
 
+
 class MemberDeleteView(DeleteView):
 	model = Member
 	success_url = reverse_lazy("member:list-club")
@@ -116,6 +126,7 @@ class MemberDeleteView(DeleteView):
 	def delete(self, request, *args, **kwargs):
 		messages.success(self.request, self.success_message)
 		return super(MemberDeleteView, self).delete(request, *args, **kwargs)
+
 
 class MemberAutocompleteView(Select2QuerySetView):
 
@@ -126,5 +137,5 @@ class MemberAutocompleteView(Select2QuerySetView):
 		if club:
 			qs = Member.objects.filter(club=club)
 		if self.q:
-			qs = qs.filter(Q(first_name__icontains = self.q) | Q(last_name__icontains = self.q))
-		return qs
+			qs = qs.filter(Q(first_name__icontains=self.q) | Q(last_name__icontains=self.q))
+		return qs.order_by('first_name', 'last_name')

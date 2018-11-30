@@ -1,6 +1,7 @@
 from django.db.models import Model, CharField, ForeignKey, DateTimeField, DecimalField, PositiveIntegerField, BooleanField, CASCADE, SET_NULL
 from member.models import Member
 
+
 class Profile(Model):
 	name = CharField(max_length=30)
 	config = CharField(max_length=128)
@@ -8,11 +9,19 @@ class Profile(Model):
 	def __str__(self):
 		return self.name
 
+
 class Sequence(Model):
-	participant = ForeignKey(Member, on_delete=CASCADE)
+	member = ForeignKey(Member, on_delete=CASCADE)
 	next_sequence = ForeignKey('self', null=True, on_delete=SET_NULL)
 	date = DateTimeField()
 	profile = ForeignKey(Profile, on_delete=CASCADE)
+
+	def sum(self):
+		result = 0
+		for shot in self.shot_set.all():
+			if shot.valid:
+				result = result + shot.value
+		return result
 
 
 class Shot(Model):
