@@ -133,3 +133,4 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Berlin'
 
 SVP_MACHINE = 'DisagRMTestMachine'
+SVP_DISAG_SERIAL_PORT = 'DisagRMTestMachine'
