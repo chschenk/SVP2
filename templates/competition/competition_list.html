@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Competitions" %}{% endblock %}
+{% block header %}{% trans "Competitions" %}{% endblock %}
+{% block competition_active %}active{% endblock %}
+{% block body %}
+<table class="table table-bordered table-striped">
+    <thead class="thead-light">
+    <tr>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "Date" %}</th>
+        <th>{% trans "Actions" %}</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for object in page_obj.object_list %}
+            <tr>
+                <td>{{ object.name }}</td>
+				<td>{{ object.start_date }}</td>
+                <td>
+					{% if object.end_date == None %}
+                    	<a href="{% url 'member:detail-club' object.pk %}" class="btn btn-default btn-sm" role="button">
+                        	<span class="fas fa-bullseye"></span>
+                    	</a>
+						<a href="{% url 'member:edit-club' object.pk %}" class="btn btn-default btn-sm" role="button">
+                    	   	<span class="fas fa-edit"></span>
+                    	</a>
+						<a href="{% url 'competition:create-price' object.pk %}" class="btn btn-default btn-sm" role="button">
+                        	<span class="fas fa-plus"></span>
+							<span class="fas fa-user"></span>
+							<span class="fas fa-trophy"></span>
+                    	</a>
+						<a href="{% url 'competition:create-group_price' object.pk %}" class="btn btn-default btn-sm" role="button">
+                        	<span class="fas fa-plus"></span>
+							<span class="fas fa-users"></span>
+							<span class="fas fa-trophy"></span>
+                    	</a>
+						<a href="{% url 'competition:create-award' object.pk %}" class="btn btn-default btn-sm" role="button">
+                        	<span class="fas fa-plus"></span>
+							<span class="fas fa-circle"></span>
+                   		</a>
+					{% else %}
+                    	<a href="{% url 'member:edit-club' object.pk %}" class="btn btn-default btn-sm" role="button">
+                        	<span class="fas fa-eye"></span>
+                    	</a>
+					{% endif %}
+                    <a href="{% url 'competition:delete-competition' object.pk %}" class="btn btn-default btn-sm" role="button">
+                        <span class="fas fa-trash"></span>
+                    </a>
+
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% bootstrap_pagination page_obj%}
+<a href="{% url 'competition:create-competition' %}"><button class="btn btn-primary">{% trans "Create competition" %}</button></a>
+{% endblock %}

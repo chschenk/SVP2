@@ -1,0 +1,5 @@
+{% extends 'confirm_delete.html' %}
+{% load i18n %}
+{% block title %}{% trans "Delete competition" %}{% endblock %}
+{% block message %}{% blocktrans %}Are you sure you want to delete competition "{{ object }}"?{% endblocktrans %}{% endblock %}
+{% block competition_active %}active{% endblock %}
