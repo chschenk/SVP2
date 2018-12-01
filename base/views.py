@@ -4,10 +4,14 @@ from django.urls import reverse
 from datetime import datetime
 from django.core.paginator import Paginator
 from django.views.generic.edit import FormView
-from django.views.generic import TemplateView, View
+from django.views.generic import TemplateView, View, ListView, CreateView, UpdateView, DeleteView
+from django.contrib.messages.views import SuccessMessageMixin
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy, gettext
 from .tasks import read_result
 from .forms import TrainingForm
-from .models import Sequence
+from .models import Sequence, Profile
+from . import models
 
 
 class TrainingView(FormView):
@@ -57,3 +61,71 @@ class TaskStatusView(View):
 			'details': result.info,
 		}
 		return JsonResponse(response_data)
+
+
+class ProfileListView(ListView):
+	model = Profile
+	paginate_by = 10
+
+	def get_queryset(self):
+		return Profile.objects.all().order_by('name').select_subclasses()
+
+	def get_context_data(self, *args, object_list=None, **kwargs):
+		ctx = super(ProfileListView, self).get_context_data(*args, object_list=object_list, **kwargs)
+		ctx['profile_list'] = [{'name': c.__name__, 'label': gettext("Add {}".format(c.type_name))}for c in Profile.__subclasses__()]
+		return ctx
+
+
+class ProfileDeleteView(SuccessMessageMixin, DeleteView):
+	model = Profile
+	success_message = gettext_lazy("Profile successfully deleted")
+	success_url = reverse_lazy('base:list-profile')
+
+	def get_context_data(self, **kwargs):
+		ctx = super(ProfileDeleteView, self).get_context_data(**kwargs)
+		ctx['cancel_url'] = reverse('base:list-profile')
+		return ctx
+
+
+class ProfileCreateView(SuccessMessageMixin, CreateView):
+	model = Profile
+	fields = '__all__'
+	template_name = "base/profile_form.html"
+	success_message = gettext_lazy("Profile successfully created")
+	success_url = reverse_lazy('base:list-profile')
+
+	def get_context_data(self, **kwargs):
+		ctx = super(ProfileCreateView, self).get_context_data(**kwargs)
+		ctx['title'] = gettext("Add {}".format(self.model.type_name))
+		return ctx
+
+
+class ProfileUpdateView(SuccessMessageMixin, UpdateView):
+	model = Profile
+	fields = '__all__'
+	template_name = "base/profile_form.html"
+	success_message = gettext_lazy("Profile successfully updated")
+	success_url = reverse_lazy('base:list-profile')
+
+	def get_context_data(self, **kwargs):
+		ctx = super(ProfileUpdateView, self).get_context_data(**kwargs)
+		ctx['title'] = gettext("Edit {}".format(self.model.type_name))
+		return ctx
+
+
+def get_create_profile_view(*args, **kwargs):
+	if hasattr(models, kwargs['profile_name']):
+		ProfileCreateView.model = getattr(models, kwargs['profile_name'])
+	else:
+		raise ValueError("Could not find profile class {}".format(kwargs['profile_name']))
+	view = ProfileCreateView.as_view()
+	return view(*args, **kwargs)
+
+
+def get_update_profile_view(*args, **kwargs):
+	if hasattr(models, kwargs['profile_name']):
+		ProfileUpdateView.model = getattr(models, kwargs['profile_name'])
+	else:
+		raise ValueError("Could not find profile class {}".format(kwargs['profile_name']))
+	view = ProfileUpdateView.as_view()
+	return view(*args, **kwargs)

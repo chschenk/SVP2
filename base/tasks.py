@@ -5,7 +5,7 @@ from .models import Member, Profile, Sequence, Shot
 from SVP2.celery import app
 
 
-@app.task()
+@app.task(max_retries=1)
 def read_result(profile_pk, member_pk):
 	machine = None
 	member = Member.objects.get(pk=member_pk)
@@ -15,7 +15,7 @@ def read_result(profile_pk, member_pk):
 			machine = cls()
 	if machine is None:
 		raise Exception("Wrong configured setting SVP_MACHINE: Could not find evaluation machine {}!".format(SVP_MACHINE))
-	result = machine.read_result(profile=profile.config)
+	result = machine.read_result(profile)
 	seq = Sequence()
 	seq.profile = profile
 	seq.date = timezone.now()

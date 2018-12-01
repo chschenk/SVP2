@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.forms.widgets import SelectDateWidget
 from django.views.generic import CreateView, ListView, DeleteView, DetailView, UpdateView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy, gettext
 from .models import Club, Member
 
@@ -25,6 +25,7 @@ class ClubCreateView(SuccessMessageMixin, CreateView):
 class ClubListView(ListView):
 	model = Club
 	paginate_by = 10
+	queryset = Club.objects.all().order_by('name')
 
 
 class ClubDeleteView(SuccessMessageMixin, DeleteView):
@@ -36,6 +37,11 @@ class ClubDeleteView(SuccessMessageMixin, DeleteView):
 		messages.success(self.request, self.success_message)
 		super(ClubDeleteView, self).delete(request, *args, **kwargs)
 
+	def get_context_data(self, **kwargs):
+		ctx = super(ClubDeleteView, self).get_context_data(**kwargs)
+		ctx['cancel_url'] = reverse('member:list-club')
+		return ctx
+
 
 class ClubDetailView(DetailView):
 	model = Club
@@ -44,7 +50,7 @@ class ClubDetailView(DetailView):
 	def get_context_data(self, **kwargs):
 		context = super(ClubDetailView, self).get_context_data()
 		page = self.request.GET.get('page')
-		members = self.object.member_set.all()
+		members = self.object.member_set.all().order_by('last_name')
 		paginator = Paginator(members, self.paginate_by)
 		try:
 			page_obj = paginator.page(page)
@@ -126,6 +132,11 @@ class MemberDeleteView(DeleteView):
 	def delete(self, request, *args, **kwargs):
 		messages.success(self.request, self.success_message)
 		return super(MemberDeleteView, self).delete(request, *args, **kwargs)
+
+	def get_context_data(self, **kwargs):
+		ctx = super(MemberDeleteView, self).get_context_data(**kwargs)
+		ctx['cancel_url'] = reverse('member:list-club')
+		return ctx
 
 
 class MemberAutocompleteView(Select2QuerySetView):

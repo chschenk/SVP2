@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Manage profiles" %}{% endblock %}
+{% block header %}{% trans "Manage profiles" %}{% endblock %}
+{% block profiles_active %}active{% endblock %}
+{% block body %}
+<table class="table table-bordered table-striped">
+    <thead class="thead-light">
+    <tr>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "Profile type" %}</th>
+        <th>{% trans "Actions" %}</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for object in page_obj.object_list %}
+            <tr>
+                <td>{{ object.name }}</td>
+				<td>{{ object.type_name }}</td>
+                <td>
+                    <a href="{% url 'base:edit-profile' object.get_type object.pk %}" class="btn btn-default btn-sm" role="button">
+                        <span class="fas fa-edit"></span>
+                    </a>
+                    <a href="{% url 'base:delete-profile' object.pk %}" class="btn btn-default btn-sm" role="button">
+                        <span class="fas fa-trash"></span>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% bootstrap_pagination page_obj%}
+{% for profile in profile_list %}
+	<a href="{% url 'base:create-profile' profile.name %}"><button class="btn btn-primary">{{ profile.label }}</button></a>
+{% endfor %}
+{% endblock %}

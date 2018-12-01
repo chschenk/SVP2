@@ -4,23 +4,27 @@ from time import sleep
 
 class EvaluationMachine:
 
-	def read_result(self):
+	def read_result(self, profile):
 		raise NotImplementedError()
 
 
 class DisagRMMachine(EvaluationMachine):
 
-	def read_result(self, profile=""):
-		if len(profile) == 0:
-			raise ValueError("Profile string may not be empty")
+	def read_result(self, profile):
+		if self.__name__ not in profile.machines:
+			raise ValueError("Profile not compatible with this machine")
 		return list()
 
 
 class DisagRMTestMachine(EvaluationMachine):
 
-	def read_result(self, profile=""):
+	def read_result(self, profile):
+		if hasattr(profile, "disagprofile"):
+			profile = getattr(profile, "disagprofile")
+		else:
+			raise AttributeError("Profile not compatible with this machine")
 		result = list()
-		for i in range(1, 11):
+		for i in range(1, profile.seg + 1):
 			shot = dict()
 			shot['ShotNumber'] = i
 			shot['Rings'] = randint(0, 10)
