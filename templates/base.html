@@ -37,13 +37,13 @@
 						<a class="nav-link" href="{% url 'base:training' %}">{% trans "Training" %}</a>
 					</li>
 					<li class="nav-item {% block competition_active %}{% endblock %}">
-						<a class="nav-link" href="{#% url '' %#}">{% trans "Competitions" %}</a>
+						<a class="nav-link" href="{% url 'competition:list-competition' %}">{% trans "Competitions" %}</a>
 					</li>
 					<li class="nav-item {% block member_active %}{% endblock %}">
 						<a class="nav-link" href="{% url 'member:list-club' %}">{% trans "Manage members" %}</a>
 					</li>
 					<li class="nav-item {% block profiles_active %}{% endblock %}">
-						<a class="nav-link" href="{#% url 'base:' %#}">{% trans "Manage profiles" %}</a>
+						<a class="nav-link" href="{% url 'base:list-profile' %}">{% trans "Manage profiles" %}</a>
 					</li>
 
 			</ul>

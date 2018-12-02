@@ -8,7 +8,7 @@
 				<h3>{% trans "Confirm deletion" %}</h3>
 				<form method="post">{% csrf_token %}
 					<p>{%block message%}{% endblock %}</p>
-					<a href="{% url 'member:list-club' %}"><button type="button" class="btn btn-primary">{% trans "Cancel" %}</button></a>
+					<a href="{{ cancel_url }}"><button type="button" class="btn btn-primary">{% trans "Cancel" %}</button></a>
 					<input class="btn btn-danger" type="submit" value="{% trans "Delete" %}"/>
 				</form>
 		</div>

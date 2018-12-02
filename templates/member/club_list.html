@@ -15,7 +15,7 @@
     </tr>
     </thead>
     <tbody>
-        {% for object in object_list %}
+        {% for object in page_obj.object_list %}
             <tr>
                 <td>{{ object.name }}</td>
                 <td>

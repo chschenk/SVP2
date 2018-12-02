@@ -19,22 +19,32 @@
     			</tr>
     		</thead>
     		<tbody>
+				{% for sequence in page_obj.object_list %}
+					<tr>
+						<td>{{ sequence.member.first_name }}</td>
+						<td>{{ sequence.member.last_name }}</td>
+						<td>{{ sequence.profile.name }}</td>
+						<td>{{ sequence.sum }}</td>
+					</tr>
+				{% endfor %}
 	  		</tbody>
 		</table>
+		{% bootstrap_pagination page_obj%}
 	</div>
 	<div class="col-sm-4">
 		<div class="card">
 			<h2>{% trans "Read result:" %}</h2>
-			<form method="" id="readForm" name="readForm" action="">
-			{% bootstrap_form form %}
-	        {% buttons %}
-	            <button id="read-result" class="btn btn-primary">{% trans "Read" %}</button>
-	        {% endbuttons %}
-			<div id="progressbar" class="card border-success" style="display: none;">
-				 <div class="card-header text-success">Please wait until the result is there</div>
-				<div class="loader"></div>
-			</div>
-			{{ form.media }}
+			<form method="POST" id="readForm" name="readForm" action="">
+				{% bootstrap_form form %}
+				{% csrf_token %}
+	        	{% buttons %}
+					<button id="read-result" type="submit" class="btn btn-primary">{% trans "Read" %}</button>
+	        	{% endbuttons %}
+				<div id="progressbar" class="card border-success" style="display: none;">
+					<div class="card-header text-success">Please wait until the result is there</div>
+					<div class="loader"></div>
+				</div>
+				{{ form.media }}
 			</form>
 		</div>
 		<div class="card">
@@ -43,36 +53,4 @@
 		</div>
 	</div>
 </div>
-<script>
-        var socket = new WebSocket(
-        	'ws://' + window.location.host +
-        	'/ws/read/');
-        socket.onmessage = function(e) {
-        	var data = JSON.parse(e.data);
-        	if (data['success'])
-        	{
-        		alert("Success: " + data['message']);
-        	}
-        	else
-        	{
-        		alert("Failure: " + data['message']);
-        	}
-        	alert("Add message and reload Page");
-        	socket.close();
-        };
-        socket.onclose = function(e) {
-        	location.reload();
-        };
-        $("#readForm").submit(function(e){
-			e.preventDefault();
-			var profile = document.querySelector('#id_Profile').value;
-        	var member = document.querySelector('#id_Member').value;
-        	socket.send(JSON.stringify({
-        		'profile': profile,
-        		'member': member
-        	}));
-        	$("#read-result").hide();
-        	$("#progressbar").show();
-		});
-    </script>
 {% endblock %}

@@ -1,0 +1,5 @@
+{% extends 'confirm_delete.html' %}
+{% load i18n %}
+{% block title %}{% trans "Delete profile" %}{% endblock %}
+{% block message %}{% blocktrans %}Are you sure you want to delete profile "{{ object }}"?{% endblocktrans %}{% endblock %}
+{% block profiles_active %}active{% endblock %}

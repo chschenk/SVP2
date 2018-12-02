@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block header %}{{ title }}{% endblock %}
+{% block competition_active %}active{% endblock %}
+{% block body %}
+<form method="post" class="form">
+    {% csrf_token %}
+	{% bootstrap_form form %}
+    {% buttons %}
+        <a href="{% url 'competition:list-competition' %}"><button type="button" class="btn btn-primary">{% trans "Cancel" %}</button></a>
+		<button name="redirect" value="competition:create-award" type="submit" class="btn btn-primary">{% trans "Create and add award" %}</button>
+		<button name="redirect" value="competition:create-group_price" type="submit" class="btn btn-primary">{% trans "Create and add group price" %}</button>
+		<button name="redirect" value="competition:create-price" type="submit" class="btn btn-primary">{% trans "Create and add price" %}</button>
+    {% endbuttons %}
+</form>
+{% endblock %}
