@@ -3,4 +3,5 @@ django-autocomplete-light
 django-bootstrap4
 celery
 django-model-utils
+djangorestframework
 redis

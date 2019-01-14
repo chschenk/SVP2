@@ -40,10 +40,10 @@
 			{% if w.current_record %}
 				<h3>{{ w.current_record.member }}</h3>
 				<h4>{% trans "Number:" %} {{ w.current_record.id }}</h4>
+				<button onclick="releaseWeapon('{% url 'api:release-weapon' w.id %}')" id="release-weapon" class="btn btn-primary">{% trans "Release weapon" %}</button>
 				<form method="POST" id="readForm" name="readForm" action="">
 					{% csrf_token %}
 					{% buttons %}
-						<a href="{% url 'competition:release-weapon' competition.pk w.id %}"><button id="release-weapon" class="btn btn-primary">{% trans "Release weapon" %}</button></a>
 						<button id="read-sequence" type="submit" value="read" class="btn btn-primary">{% trans "Read sequence" %}</button>
 	        		{% endbuttons %}
 				</form>
@@ -65,4 +65,12 @@
 	</div>
 	{% endfor %}
 </div>
+<script>
+	function releaseWeapon (url) {
+		fetch(url).then(function(response) {
+			location.reload();
+		});
+
+}
+</script>
 {% endblock %}
