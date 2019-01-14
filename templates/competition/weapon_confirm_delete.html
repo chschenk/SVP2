@@ -1,0 +1,5 @@
+{% extends 'confirm_delete.html' %}
+{% load i18n %}
+{% block title %}{% trans "Delete weapon" %}{% endblock %}
+{% block message %}{% blocktrans %}Are you sure you want to delete weapon "{{ object }}"?{% endblocktrans %}{% endblock %}
+{% block weapon_active %}active{% endblock %}

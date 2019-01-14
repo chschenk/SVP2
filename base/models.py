@@ -1,17 +1,23 @@
 from django.db.models import Model, CharField, ForeignKey, DateTimeField, DecimalField, PositiveIntegerField
 from django.db.models import BooleanField, CASCADE, SET_NULL
 from django.utils.translation import gettext_lazy
+from django.forms import Form
 from model_utils.managers import InheritanceManager
 from member.models import Member
 
 
 class Profile(Model):
 	name = CharField(max_length=30)
+	manual_profile = None
 	type_name = None
+	extra_form = None
 	objects = InheritanceManager()
 
 	def get_type(self):
 		return None
+
+	def is_manual_profile(self):
+		return False
 
 	def __str__(self):
 		return self.name
@@ -19,6 +25,7 @@ class Profile(Model):
 
 class DisagProfile(Profile):
 	type_name = gettext_lazy("DISAG Profile")
+	manual_profile = False
 	sch_choices = (
 		("LG10", "LG 10er-Band"),
 		("LG5", "LG 5er-Band"),
@@ -109,6 +116,29 @@ class DisagProfile(Profile):
 
 	def get_type(self):
 		return self.__class__.__name__
+
+
+class FunProfileForm(Form):
+
+	def __init__(self, profile):
+		for i in range(1, profile + 1):
+			self.fields.append(PositiveIntegerField(verbose_name="Schuss {}".format(i)))
+
+
+class FunProfile(Profile):
+	type_name = gettext_lazy("Fun card profile")
+	seg = PositiveIntegerField(null=True, verbose_name="Schußzahl Gesamt")
+	manual_profile = True
+	extra_form = FunProfileForm
+
+	def get_profile(self):
+		return self.seg
+
+	def get_type(self):
+		return self.__class__.__name__
+
+	def is_manual_profile(self):
+		return True
 
 
 class Sequence(Model):

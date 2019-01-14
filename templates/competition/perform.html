@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Competition" %}{% endblock %}
+{% block header %}{% trans "Competition" %}{% endblock %}
+{% block competition_active %}active{% endblock %}
+{% block body %}
+<div class="row">
+	<div class="col-sm-8">
+		<table class="table table-bordered table-striped">
+    		<thead class="thead-light">
+    			<tr>
+        			<th>{% trans "First name" %}</th>
+        			<th>{% trans "Last name" %}</th>
+        			<th>{% trans "Profile" %}</th>
+        			<th>{% trans "Result" %}</th>
+    			</tr>
+    		</thead>
+    		<tbody>
+				{% for sequence in page_obj.object_list %}
+					<tr>
+						<td>{{ sequence.member.first_name }}</td>
+						<td>{{ sequence.member.last_name }}</td>
+						<td>{{ sequence.profile.name }}</td>
+						<td>{{ sequence.sum }}</td>
+					</tr>
+				{% endfor %}
+	  		</tbody>
+		</table>
+		{% bootstrap_pagination page_obj%}
+	</div>
+</div>
+<div class="row">
+	{% for w in weapons %}
+	<div class="col-sm-4">
+		<div class="card">
+			<h2>{{ w.name }}</h2>
+			{% if w.current_record %}
+				<h3>{{ w.current_record.member }}</h3>
+				<h4>{% trans "Number:" %} {{ w.current_record.id }}</h4>
+				<form method="POST" id="readForm" name="readForm" action="">
+					{% csrf_token %}
+					{% buttons %}
+						<a href="{% url 'competition:release-weapon' competition.pk w.id %}"><button id="release-weapon" class="btn btn-primary">{% trans "Release weapon" %}</button></a>
+						<button id="read-sequence" type="submit" value="read" class="btn btn-primary">{% trans "Read sequence" %}</button>
+	        		{% endbuttons %}
+				</form>
+			{% else %}
+			<form method="POST" id="readForm" name="readForm" action="">
+				{% bootstrap_form w.form %}
+				{% csrf_token %}
+	        	{% buttons %}
+					<button id="read-result" type="submit" class="btn btn-primary">{% trans "Start" %}</button>
+	        	{% endbuttons %}
+				<div id="progressbar" class="card border-success" style="display: none;">
+					<div class="card-header text-success">Please wait until the result is there</div>
+					<div class="loader"></div>
+				</div>
+				{{ w.form.media }}
+			</form>
+			{% endif %}
+		</div>
+	</div>
+	{% endfor %}
+</div>
+{% endblock %}

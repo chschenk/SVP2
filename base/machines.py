@@ -1,6 +1,5 @@
 from random import random, randint
 from time import sleep
-from multiprocessing import Process
 from serial import Serial, PARITY_NONE, STOPBITS_ONE
 from SVP2.settings import SVP_DISAG_SERIAL_PORT
 
@@ -11,10 +10,10 @@ class EvaluationMachine:
 		raise NotImplementedError()
 
 
-ACK = 0x06
-ENQ = 0x05
-STX = 0x02
-CR = 0x0D
+ACK = bytearray(0x06)
+ENQ = bytearray(0x05)
+STX = bytearray(0x02)
+CR = bytearray(0x0D)
 
 
 class DisagRMMachine(EvaluationMachine):
@@ -23,16 +22,10 @@ class DisagRMMachine(EvaluationMachine):
 	_serial = None
 
 	def read_result(self, profile):
-		if hasattr(profile, "disagprofile"):
-			profile = getattr(profile, "disagprofile")
+		if profile.__class__.__name__ == "DisagProfile":
+			self._read_result(profile.get_profile())
 		else:
 			raise AttributeError("Profile not compatible with this machine")
-		proc = Process(target=self._read_result, args=(profile.get_profile(),))
-		proc.start()
-		proc.join(timeout=self.timeout)
-		if proc.exitcode is None:
-			proc.terminate()
-			return False
 
 	def _read_reply(self):
 		checksum = 0
@@ -86,7 +79,7 @@ class DisagRMMachine(EvaluationMachine):
 			self._result_read = result
 			self._successful = True
 			return
-		except:
+		except Exception as e:
 			self._serial.close()
 			self._result_read = result
 			self._successful = False
@@ -96,7 +89,7 @@ class DisagRMMachine(EvaluationMachine):
 class DisagRMTestMachine(EvaluationMachine):
 
 	def read_result(self, profile):
-		if hasattr(profile, "disagprofile"):
+		if profile.__class__.__name__ == "DisagProfile":
 			profile = getattr(profile, "disagprofile")
 		else:
 			raise AttributeError("Profile not compatible with this machine")
@@ -113,3 +106,4 @@ class DisagRMTestMachine(EvaluationMachine):
 
 			result.append(shot)
 		return result
+		#ToDo rework

@@ -17,17 +17,21 @@ from . import models
 class TrainingView(FormView):
 	template_name = "base/training.html"
 	form_class = TrainingForm
-	task_id = None
 	paginate_by = 10
 
 	def get_success_url(self):
-		return reverse('base:readResult', kwargs={'task_id': self.task_id})
+		return self.success_url
 
 	def form_valid(self, form):
-		print(form.cleaned_data)
 		profile_pk = form.cleaned_data['Profile'].pk
 		member_pk = form.cleaned_data['Member'].pk
-		self.task_id = read_result.delay(profile_pk, member_pk)
+		profile = Profile.objects.select_subclasses().get(pk=profile_pk)
+		if profile.is_manual_profile():
+			self.success_url = reverse('base:training')
+			#ToDo add manual form
+		else:
+			task_id = read_result.delay(profile_pk, member_pk)
+			self.success_url = reverse('base:readResult', kwargs={'task_id': task_id})
 		return super().form_valid(form)
 
 	def get_context_data(self, **kwargs):
@@ -57,8 +61,8 @@ class TaskStatusView(View):
 	def get(self, request, task_id):
 		result = AsyncResult(task_id)
 		response_data = {
-			'state': result.state,
-			'details': result.info,
+			'state': str(result.state),
+			'details': str(result.info),
 		}
 		return JsonResponse(response_data)
 

@@ -5,11 +5,11 @@ from .models import Member, Profile, Sequence, Shot
 from SVP2.celery import app
 
 
-@app.task(max_retries=1)
+@app.task(max_retries=1, time_limit=60)
 def read_result(profile_pk, member_pk):
 	machine = None
 	member = Member.objects.get(pk=member_pk)
-	profile = Profile.objects.get(pk=profile_pk)
+	profile = Profile.objects.select_subclasses().get(pk=profile_pk)
 	for cls in EvaluationMachine.__subclasses__():
 		if cls.__name__ == SVP_MACHINE:
 			machine = cls()

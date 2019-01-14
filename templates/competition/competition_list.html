@@ -22,10 +22,10 @@
 				<td>{{ object.start_date }}</td>
                 <td>
 					{% if object.end_date == None %}
-                    	<a href="{% url 'member:detail-club' object.pk %}" class="btn btn-default btn-sm" role="button">
+                    	<a href="{% url 'competition:perform-competition' object.pk %}" class="btn btn-default btn-sm" role="button">
                         	<span class="fas fa-bullseye"></span>
                     	</a>
-						<a href="{% url 'member:edit-club' object.pk %}" class="btn btn-default btn-sm" role="button">
+						<a href="{% url 'competition:edit-competition' object.pk %}" class="btn btn-default btn-sm" role="button">
                     	   	<span class="fas fa-edit"></span>
                     	</a>
 						<a href="{% url 'competition:create-price' object.pk %}" class="btn btn-default btn-sm" role="button">
