@@ -1,14 +1,16 @@
-from django.views.generic import CreateView, DetailView, ListView, DeleteView, UpdateView, RedirectView
+from django.views.generic import CreateView, DetailView, ListView, DeleteView, UpdateView, RedirectView, TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Max
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy, gettext
 from django.core.paginator import Paginator
+from django.forms.formsets import formset_factory
 from django.utils import timezone
-from base.models import Sequence, Member
-from .models import Competition, Price, Award, GroupPrice, Weapon, CompetitionRecord
-from .forms import MemberForm
+from base.models import Sequence, Member, Profile
+from .models import Competition, Price, Award, GroupPrice, Weapon, CompetitionRecord, PriceRecord
+from .forms import MemberForm, ReadRecordForm, AwardWinnerForm
+from .tasks import read_competition_result
 
 
 class CompetitionListView(ListView):
@@ -61,7 +63,7 @@ class CompetitionUpdateView(SuccessMessageMixin, UpdateView):
 class PriceCreateView(SuccessMessageMixin, CreateView):
 	model = Price
 	success_message = gettext_lazy("Price successfully created")
-	fields = ['name']
+	fields = ['name', 'profile']
 
 	def form_valid(self, form):
 		competition = Competition.objects.get(pk=self.kwargs.get("competition_pk"))
@@ -183,6 +185,7 @@ class CompetitionPerformView(FormView):
 				record_number = CompetitionRecord.objects.filter(competition=competition).aggregate(Max('record_number'))['record_number__max']
 			competition_record.record_number = record_number + 1
 			competition_record.save()
+		#Todo: Check if member already finished competition
 		weapon.current_record = competition_record
 		weapon.save()
 		return super(CompetitionPerformView, self).form_valid(form)
@@ -200,8 +203,8 @@ class CompetitionPerformView(FormView):
 		ctx['weapons'] = weapons
 		ctx['competition'] = Competition.objects.get(pk=self.kwargs['pk'])
 		page = self.request.GET.get('page')
-		sequences = Sequence.objects.filter(date__date=timezone.now().date()).order_by('date')
-		paginator = Paginator(sequences, self.paginate_by)
+		records = CompetitionRecord.objects.filter(competition=ctx['competition'])
+		paginator = Paginator(records, self.paginate_by)
 		try:
 			page_obj = paginator.page(page)
 		except:
@@ -221,3 +224,36 @@ class ReleaseWeaponView(RedirectView):
 	def get_redirect_url(self, *args, **kwargs):
 		print(self.kwargs['pk'])
 		return reverse('competition:perform-competition', self.kwargs['pk'])
+
+
+class ReadRecordView(FormView):
+	form_class = ReadRecordForm
+
+	def form_valid(self, form):
+		weapon = form.cleaned_data['Weapon']
+		price = form.cleaned_data['Price']
+		profile_pk = price.profile.pk
+		profile = Profile.objects.select_subclasses().get(pk=profile_pk)
+		if profile.is_manual_profile():
+			self.success_url = reverse('base:training')
+			#ToDo add manual form
+		else:
+			task_id = read_competition_result.delay(price.pk, weapon.pk)
+			self.success_url = reverse('competition:read-result', kwargs={'pk': self.kwargs['pk'], 'task_id': task_id})
+		return super().form_valid(form)
+
+
+class ReadCompetitionResult(TemplateView):
+	template_name = "competition/read_result.html"
+
+	def get_context_data(self, **kwargs):
+		ctx = super(ReadCompetitionResult, self).get_context_data(**kwargs)
+		ctx['task_id'] = kwargs['task_id']
+		ctx['competition_pk'] = CompetitionRecord.objects.get(pk=kwargs['pk']).competition.pk
+		return ctx
+
+
+class EndCompetitionView(FormView):
+
+	def __init__(self):
+		formset = formset_factory(form=AwardWinnerForm)

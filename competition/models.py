@@ -1,6 +1,6 @@
-from django.db.models import Model, ForeignKey, CharField, DateField, ManyToManyField, PositiveIntegerField, BooleanField, CASCADE, SET_NULL
+from django.db.models import Model, ForeignKey, CharField, DateField, ManyToManyField, PositiveIntegerField, BooleanField, CASCADE, SET_NULL, PROTECT
 from member.models import Member
-from base.models import Sequence
+from base.models import Sequence, Profile
 
 
 class Competition(Model):
@@ -22,6 +22,7 @@ class Price(Model):
 	name = CharField(max_length=30)
 	competition = ForeignKey(Competition, on_delete=CASCADE)
 	winner = ForeignKey(Member, null=True, on_delete=SET_NULL)
+	profile = ForeignKey(Profile, null=False, on_delete=PROTECT)
 
 	def __str__(self):
 		return self.name
