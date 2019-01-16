@@ -20,12 +20,14 @@
     		</thead>
     		<tbody>
 				{% for sequence in page_obj.object_list %}
-					<tr>
-						<td>{{ sequence.member.first_name }}</td>
-						<td>{{ sequence.member.last_name }}</td>
-						<td>{{ sequence.profile.name }}</td>
-						<td>{{ sequence.sum }}</td>
-					</tr>
+					{% if sequence.pricerecord_set.all|length == 0 %}
+						<tr>
+							<td>{{ sequence.member.first_name }}</td>
+							<td>{{ sequence.member.last_name }}</td>
+							<td>{{ sequence.profile.name }}</td>
+							<td>{{ sequence.sum }}</td>
+						</tr>
+					{% endif %}
 				{% endfor %}
 	  		</tbody>
 		</table>
