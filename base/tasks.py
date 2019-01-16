@@ -1,7 +1,7 @@
 from django.utils import timezone
 from SVP2.settings import SVP_MACHINE
 from .machines import EvaluationMachine
-from .models import Member, Profile, Sequence, Shot
+from .models import Member, Profile, Sequence, Shot, MonitorQueueElement
 from SVP2.celery import app
 
 
@@ -30,4 +30,8 @@ def read_result(profile_pk, member_pk):
 		shot.valid = s['Validity']
 		shot.sequence = seq
 		shot.save()
+	monitor_element = MonitorQueueElement()
+	monitor_element.monitor_setting = 'E'  #Todo: Make this configurable
+	monitor_element.sequence = seq
+	monitor_element.save()
 	return True

@@ -5,6 +5,14 @@ from django.forms import Form
 from model_utils.managers import InheritanceManager
 from member.models import Member
 
+MONITOR_SETTINGS = (
+	('N', 'Nothing'),
+	('S', 'ShotImage'),
+	('P', 'ShotImageWithPoints'),
+	('A', 'EverythingAnonym'),
+	('E', 'Everything'),
+)
+
 
 class Profile(Model):
 	name = CharField(max_length=30)
@@ -162,3 +170,9 @@ class Shot(Model):
 	angle = DecimalField(max_digits=6, decimal_places=3)
 	valid = BooleanField()
 	sequence = ForeignKey(Sequence, on_delete=CASCADE)
+
+
+class MonitorQueueElement(Model):
+	sequence = ForeignKey(Sequence, on_delete=CASCADE)
+	queued = DateTimeField(auto_now=True)
+	monitor_setting = CharField(max_length=1, choices=MONITOR_SETTINGS)
